@@ -1,19 +1,57 @@
 package com.epam.jwd.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Flight {
-    private String callsign = new String();
+    private String callsign = "";
     private FlightType flightType;
     private String destination;
     private Terminal terminal;
     private LocalDateTime flightTime;
-    private List<Passenger> passengerList = new CopyOnWriteArrayList<>();
+    private final List<Passenger> passengerList = new ArrayList<>();
+    private ReentrantLock reentrantLock;
+    private Condition condition;
 
-    public List<Passenger> getPassengerList() {
+
+    public Flight(String callsign, FlightType flightType, String destination, Terminal terminal, LocalDateTime flightTime) {
+        this.callsign = callsign;
+        this.flightType = flightType;
+        this.destination = destination;
+        this.terminal = terminal;
+        this.flightTime = flightTime;
+        reentrantLock = new ReentrantLock();
+        condition = reentrantLock.newCondition();
+    }
+
+    public void addPassengerToFlight(Passenger passenger) {
+        reentrantLock.lock();
+        passengerList.add(passenger);
+        reentrantLock.unlock();
+    }
+
+    public void addAllPassengersToFlight(List<Passenger> passengerList) {
+        reentrantLock.lock();
+        passengerList.addAll(passengerList);
+        reentrantLock.unlock();
+    }
+
+    public List<Passenger> getAllPassengerFromFlight (){
         return passengerList;
+        /*reentrantLock.lock();
+        List unmodifiablePassengerList = Collections.unmodifiableList(passengerList);
+        reentrantLock.unlock();
+        return unmodifiablePassengerList;*/
+    }
+
+    public void removePassengerFromFlight(Passenger passenger){
+        reentrantLock.lock();
+        passengerList.remove(passenger);
+        reentrantLock.unlock();
     }
 
     public String getCallsign() {
@@ -52,17 +90,13 @@ public class Flight {
         return flightTime;
     }
 
-    public void setFlightTime(LocalDateTime flightTime) {
-        this.flightTime = flightTime;
-    }
-
-    public void setPassengerList(List<Passenger> passengerList) {
-        this.passengerList = passengerList;
+    public void setFlightTime(LocalDateTime flightDateTime) {
+        this.flightTime = flightDateTime;
     }
 
     @Override
     public String toString() {
-        return  "Flight{" +
+        return "Flight{" +
                 "callsign='" + callsign + '\'' +
                 ", flightType= " + flightType +
                 ", destination='" + destination + '\'' +

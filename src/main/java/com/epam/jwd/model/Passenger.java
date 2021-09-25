@@ -5,11 +5,17 @@ public class Passenger {
     private String firstName;
     private String lastName;
     private Ticket nextTicket;
+    private boolean changeTicket;
 
-    public Passenger(String firstName, String lastName, Ticket nextTicket) {
+    public Passenger(String firstName, String lastName, Ticket nextTicket, boolean changeTicket) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.nextTicket = nextTicket;
+        this.changeTicket = changeTicket;
+    }
+
+    public boolean isChangeTicket() {
+        return changeTicket;
     }
 
     public String getFirstName() {

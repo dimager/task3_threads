@@ -27,29 +27,28 @@ public class PassengerThread extends Thread {
 
     @Override
     public void run() {
-        if (Objects.isNull(semaphore)) {
+        if (Objects.nonNull(semaphore)) {
+            if (passenger.isChangeTicket()) {
+                ticketExchanger();
+            }
+            waiting();
+            Thread.currentThread().setName("term. " + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
+            try {
+                semaphore.acquire();
+                System.out.println(passenger.getFirstName() + " " + passenger.getLastName() + " is going to next flight " + passenger.getNextTicket().getFlight().getCallsign());
+                passenger.setNextTicket(null);
+                flight.addPassengerToFlight(passenger);
+                sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                Thread.currentThread().interrupt();
+                semaphore.release();
+            }
+        } else {
             Thread.currentThread().interrupt();
         }
 
-        if (passenger.getFirstName().equals("Oliver")) {
-            System.out.println("change");
-            ticketExchanger();
-        }
-
-        waiting();
-        Thread.currentThread().setName("term. " + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
-        try {
-            semaphore.acquire();
-            System.out.println(passenger.getFirstName() + " " + passenger.getLastName() + " is going to next flight " + passenger.getNextTicket().getFlight().getCallsign());
-            passenger.setNextTicket(null);
-            flight.getPassengerList().add(passenger);
-            sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            Thread.currentThread().interrupt();
-            semaphore.release();
-        }
     }
 
 

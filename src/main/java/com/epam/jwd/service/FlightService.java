@@ -13,6 +13,7 @@ public class FlightService implements Runnable {
     Airport airport;
     Flight flight;
     Exchanger<Flight> flightExchanger = new Exchanger<>();
+
     public FlightService(Flight flight, Airport airport) {
         this.flight = flight;
         this.airport = airport;
@@ -20,20 +21,12 @@ public class FlightService implements Runnable {
 
     @Override
     public void run() {
-        make();
-    }
-
-    public void make() {
-        for (Passenger passenger : flight.getPassengerList()) {
-            if (Objects.nonNull(passenger.getNextTicket()) && passenger.getNextTicket().getFlight().getFlightTime().isAfter(LocalDateTime.now())) {
-                new PassengerThread(getTerminalSemaphore(passenger), passenger, passenger.getNextTicket().getFlight(), flightExchanger);
-                flight.getPassengerList().remove(passenger);
-            } else {
-                flight.getPassengerList().remove(passenger);
-          //      System.out.println("Passenger go to the city " + passenger);
+            for (Passenger passenger : flight.getAllPassengerFromFlight()) {
+                if (Objects.nonNull(passenger.getNextTicket()) && passenger.getNextTicket().getFlight().getFlightTime().isAfter(LocalDateTime.now())) {
+                    new PassengerThread(getTerminalSemaphore(passenger), passenger, passenger.getNextTicket().getFlight(), flightExchanger);
+                }
+                flight.removePassengerFromFlight(passenger);
             }
-        }
-
     }
 
     public Semaphore getTerminalSemaphore(Passenger passenger) {
