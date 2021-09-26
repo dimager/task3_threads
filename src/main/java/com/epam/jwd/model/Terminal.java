@@ -1,8 +1,9 @@
 package com.epam.jwd.model;
 
+import java.util.Comparator;
 import java.util.concurrent.Semaphore;
 
-public class Terminal {
+public class Terminal implements Comparator<Terminal> {
     private String terminalId;
     private TerminalType terminalType;
     private Semaphore semaphore;
@@ -21,16 +22,8 @@ public class Terminal {
         return terminalType;
     }
 
-    public void setTerminalId(String terminalId) {
-        this.terminalId = terminalId;
-    }
-
     public Semaphore getSemaphore() {
         return semaphore;
-    }
-
-    public void setSemaphore(Semaphore semaphore) {
-        this.semaphore = semaphore;
     }
 
     @Override
@@ -39,6 +32,11 @@ public class Terminal {
                 "terminalId='" + terminalId + '\'' +
                 ", terminalType=" + terminalType +
                 '}';
+    }
+
+    @Override
+    public int compare(Terminal o1, Terminal o2) {
+        return o1.getTerminalType().compareTo(o2.terminalType);
     }
 
     @Override

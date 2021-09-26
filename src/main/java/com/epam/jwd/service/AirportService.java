@@ -7,6 +7,7 @@ import com.epam.jwd.model.Terminal;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Comparator;
@@ -17,55 +18,30 @@ import java.util.stream.Collectors;
 public class AirportService {
     private final static Logger logger = LogManager.getLogger(AirportService.class);
     private static final Random random = new Random();
+    private static final String TABLE_HEAD_MESSAGE_STRING = "Table -> Time: ";
+    private static final String TABLE_COLLUM_NAMES_STRING = String.format("\n%8s %10s %12s %10s %12s %12s", "Flight", "Terminal", "Date", "Dep Time", "Passengers", "Flight type");
+    private static final String DEPARTING_FLIGHTS_STRING = "Departing flights:";
+    private static final String ARRIVING_FLIGHTS_STRING = "Arriving flights:";
 
-    public static void printDepartureTable(Airport airport) {
-        logger.info("Departure table");
-        logger.info("%8s %10s %12s %10s %12s\n", "Flight", "Terminal", "Date", "Dep Time", "Passengers");
-        airport.getDepartureFlightList().stream()
-                .sorted(Comparator.comparing(Flight::getFlightTime))
-                .forEach(flight -> logger.info("%8s %10s %12s %10s %12s\n",
-                        flight.getCallsign(),
-                        flight.getTerminal().getTerminalId(),
-                        flight.getFlightTime().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
-                        flight.getFlightTime().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
-                        flight.getAllPassengerFromFlight().size()));
-    }
-
-    public static void printArrivalTable(Airport airport) {
-        logger.info("Arrive table");
-        logger.info("%8s %10s %12s %10s %12s\n", "Flight", "Terminal", "Date", "Arr Time", "Passengers");
-        airport.getArrivalFlightList().stream()
-                .sorted(Comparator.comparing(Flight::getFlightTime))
-                .forEach(flight -> logger.info("%8s %10s %12s %10s %12s\n",
-                        flight.getCallsign(),
-                        flight.getTerminal().getTerminalId(),
-                        flight.getFlightTime().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
-                        flight.getFlightTime().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
-                        flight.getAllPassengerFromFlight().size()));
+    public static void printTable(Airport airport) {
+        logger.info(TABLE_HEAD_MESSAGE_STRING + LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
+        logger.info(DEPARTING_FLIGHTS_STRING + TABLE_COLLUM_NAMES_STRING);
+        printFlightList(airport.getFlightList().stream()
+                .filter(flight -> flight.getTerminal().getTerminalType() == TerminalType.DEPARTING)
+                .collect(Collectors.toList()));
+        logger.info(ARRIVING_FLIGHTS_STRING + TABLE_COLLUM_NAMES_STRING);
+        printFlightList(airport.getFlightList().stream()
+                .filter(flight -> flight.getTerminal().getTerminalType() == TerminalType.ARRIVING)
+                .collect(Collectors.toList()));
     }
 
     public static void printFlightPassenger(Flight flight) {
-        flight.getAllPassengerFromFlight().stream().forEach(System.out::println);
+        logger.info(flight.getCallsign());
+        flight.getAllPassengerFromFlight().stream().forEach(passenger -> logger.info(passenger));
     }
 
-    public static void printArrPassangerList(Airport airport) {
-        for (Flight flight : airport.getArrivalFlightList()) {
-            System.out.println(flight.getCallsign());
-            flight.getAllPassengerFromFlight().stream().forEach(System.out::println);
-        }
-    }
-
-    public static void printDepPassengerList(Airport airport) {
-        airport.getDepartureFlightList().stream().forEach(flight -> printFlightPassenger(flight));
-    }
-
-    public static Flight getFlightByCallsign(Airport airport, String callsing) {
-        for (Flight flight : airport.getDepartureFlightList()) {
-            if (flight.getCallsign().equals(callsing)) {
-                return flight;
-            }
-        }
-        return null;
+    public static void printPassengerList(Airport airport){
+        airport.getFlightList().stream().forEach( flight -> printFlightPassenger(flight));
     }
 
     public static Terminal getRandomArrivalTerminal(Airport airport) {
@@ -76,5 +52,16 @@ public class AirportService {
     public static Terminal getRandomDepartureTerminal(Airport airport) {
         List<Terminal> list = airport.getTerminals().stream().filter(terminal -> terminal.getTerminalType() == TerminalType.DEPARTING).collect(Collectors.toList());
         return list.get(random.nextInt(list.size()));
+    }
+
+    private static void printFlightList(List<Flight> list){
+        list.stream().sorted(Comparator.comparing(Flight::getFlightTime))
+                .forEach(flight -> logger.info(String.format("%8s %10s %12s %10s %12s %12s",
+                        flight.getCallsign(),
+                        flight.getTerminal().getTerminalId(),
+                        flight.getFlightTime().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        flight.getFlightTime().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
+                        flight.getAllPassengerFromFlight().size(),
+                        flight.getTerminal().getTerminalType())));
     }
 }

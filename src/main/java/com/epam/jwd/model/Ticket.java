@@ -12,10 +12,6 @@ public class Ticket {
         return flight;
     }
 
-    public void setFlight(Flight flight) {
-        this.flight = flight;
-    }
-
     @Override
     public String toString() {
         return "Ticket{" +
@@ -27,14 +23,12 @@ public class Ticket {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Ticket ticket = (Ticket) o;
-
-        return flight != null ? flight.equals(ticket.flight) : ticket.flight == null;
+        return flight.equals(ticket.flight);
     }
 
     @Override
     public int hashCode() {
-        return flight != null ? flight.hashCode() : 0;
+        return flight.hashCode();
     }
 }

@@ -3,21 +3,22 @@
     <Properties>
         <property name="pattern_console">%msg%n</property>
         <property name="pattern_file">%d{HH:mm:ss.SSS} [%t] %-5level %-10logger{1} %msg%n</property>
+        <property name="pattern_file_appinfo">%d{HH:mm:ss} %msg%n</property>
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${pattern_console}"/>
         </Console>
-        <RollingFile name="DebugRollingFile1" filename="logs/log.log"
+        <RollingFile name="DebugRollingFile" filename="logs/log.log"
                      filePattern="logs/log-%d{yyyy-MM-dd-hh-mm-ss}.log">
             <PatternLayout pattern="${pattern_file}"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
         </RollingFile>
-        <RollingFile name="DebugRollingFile2" filename="logs/info.log"
-                     filePattern="logs/log-%d{yyyy-MM-dd-hh-mm-ss}.log">
-            <PatternLayout pattern="${pattern_file}"/>
+        <RollingFile name="AppInfoFileRollingFile" filename="logs/info.log"
+                     filePattern="logs/info-%d{yyyy-MM-dd-hh-mm-ss}.log">
+            <PatternLayout pattern="${pattern_file_appinfo}"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
@@ -25,15 +26,16 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="AirportInfo" level="info" additivity="false">
-            <AppenderRef ref="DebugRollingFile2"/>
+        <Logger name="AirportOutputInfo" level="info" additivity="false">
+            <AppenderRef ref="AppInfoFileRollingFile"/>
         </Logger>
 
         <Logger name="com.epam.jwd" level="info" additivity="false">
-            <AppenderRef ref="DebugRollingFile1"/>
+            <AppenderRef ref="DebugRollingFile"/>
+            <AppenderRef ref="Console"/>
         </Logger>
         <Root level="info">
-            <AppenderRef ref="DebugRollingFile1"/>
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>

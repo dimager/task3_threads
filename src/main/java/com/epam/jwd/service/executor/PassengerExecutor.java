@@ -2,6 +2,7 @@ package com.epam.jwd.service.executor;
 
 import com.epam.jwd.model.Flight;
 import com.epam.jwd.model.Passenger;
+import com.epam.jwd.model.Ticket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,56 +10,89 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class PassengerExecutor extends Thread {
-    private final static Logger logger = LogManager.getLogger("AirportInfo");
+    private final static Logger logger = LogManager.getLogger(PassengerExecutor.class);
+    private final static Logger appLogger = LogManager.getLogger("AirportOutputInfo");
+    private static final String TERM_THREAD_STRING = "term. ";
+    private static final String INTERRUPTION_ERROR_MESSAGE_STRING = "InterruptedException PassengerExecutor";
+    private static final String GOING_NEXT_FLIGHT_STRING = " is going to next flight ";
+    private static final String IS_WAITING_STRING = " is waiting ";
+    private static final String PASSENGER_EXECUTOR_THREAD_START_STRING = "PassengerExecutor start";
+    private static final String TICKET_EXCHANGER_START_METHOD_STRING = "ticketExchanger method start";
+    private static final String WAIT_METHOD_START_STRING = "waitNextFlight method ";
+    private static final String TIMEOUT_EXCEPTION_STRING = "Timeout exception. Ticket is not changed";
     private final Passenger passenger;
     private final Semaphore semaphore;
-    private final Exchanger<Flight> flightExchanger;
+    private final Exchanger<Passenger> ticketExchanger;
     private Flight flight;
 
-    public PassengerExecutor(Semaphore semaphore, Passenger passenger, Flight flight, Exchanger<Flight> flightExchanger) {
+    public PassengerExecutor(Semaphore semaphore, Passenger passenger, Exchanger<Passenger> ticketExchanger) {
         this.passenger = passenger;
         this.semaphore = semaphore;
-        this.flight = flight;
-        this.flightExchanger = flightExchanger;
+        this.ticketExchanger = ticketExchanger;
         new Thread(this).start();
     }
 
     @Override
     public void run() {
+        logger.debug(PASSENGER_EXECUTOR_THREAD_START_STRING);
         if (Objects.nonNull(semaphore)) {
-            if (passenger.isChangeTicket()) {
-           //     ticketExchanger();
+            if (passenger.wantToChangeTicket()) {
+                ticketExchanger();
             }
-            hasToWaitNextFlight();
-            Thread.currentThread().setName("term. " + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
+            flight=passenger.getNextTicket().getFlight();
+            Thread.currentThread().setName(TERM_THREAD_STRING + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
+            waitNextFlight();
             try {
                 semaphore.acquire();
-                logger.info(passenger.getFirstName() + " " + passenger.getLastName() + " is going to next flight " + passenger.getNextTicket().getFlight().getCallsign());
+                appLogger.info(passenger.getFirstName() + " " + passenger.getLastName() + GOING_NEXT_FLIGHT_STRING + passenger.getNextTicket().getFlight().getCallsign());
                 passenger.setNextTicket(null);
                 flight.addPassengerToFlight(passenger);
                 sleep(2000);
             } catch (InterruptedException e) {
+                logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
                 e.printStackTrace();
             } finally {
-                Thread.currentThread().interrupt();
                 semaphore.release();
+                Thread.currentThread().interrupt();
             }
         } else {
             Thread.currentThread().interrupt();
         }
-
     }
 
-    private void hasToWaitNextFlight() {
+    private void ticketExchanger() {
+        logger.debug(TICKET_EXCHANGER_START_METHOD_STRING);
+        try {
+            appLogger.info("******" + passenger.getFirstName() + " " + passenger.getLastName() + " want to change ticket  " + passenger.getNextTicket().getFlight().getCallsign());
+            if (!passenger.getNextTicket().getFlight().equals(ticketExchanger.exchange(passenger,60, TimeUnit.SECONDS).getNextTicket().getFlight())) {
+                Ticket ticket = passenger.getNextTicket();
+                passenger.setNextTicket(ticketExchanger.exchange(passenger,60, TimeUnit.SECONDS).getNextTicket());
+                ticketExchanger.exchange(passenger).setNextTicket(ticket);
+                passenger.setChangeTicket(false);
+                appLogger.info("******" + passenger.getFirstName() + " " + passenger.getLastName() + " changed ticket with " + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());
+            } else {
+                appLogger.info("******" + passenger.getFirstName() + passenger.getLastName() + " change is failed, same flight with " + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());
+            }
+        } catch (InterruptedException e) {
+            logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
+        } catch (TimeoutException e) {
+            logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
+        }
+    }
+
+    private void waitNextFlight() {
+        logger.debug(WAIT_METHOD_START_STRING + passenger.getFirstName() + " " + passenger.getLastName());
         while (LocalDateTime.now().isBefore(passenger.getNextTicket().getFlight().getFlightTime().minusHours(2))) {
-            Thread.currentThread().setName(passenger.getFirstName() + " " + passenger.getLastName() + " is waiting " + passenger.getNextTicket().getFlight().getCallsign());
-            logger.info(passenger.getFirstName() + " " + passenger.getLastName() + " is waing flight" + passenger.getNextTicket().getFlight().getCallsign());
+            Thread.currentThread().setName(passenger.getFirstName() + " " + passenger.getLastName() + IS_WAITING_STRING + passenger.getNextTicket().getFlight().getCallsign());
+            appLogger.info(passenger.getFirstName() + " " + passenger.getLastName() + IS_WAITING_STRING + passenger.getNextTicket().getFlight().getCallsign());
             try {
                 sleep(60000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(TIMEOUT_EXCEPTION_STRING + e);
             }
         }
     }

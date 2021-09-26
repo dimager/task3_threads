@@ -1,6 +1,5 @@
 package com.epam.jwd.model;
 
-
 public class Passenger {
     private String firstName;
     private String lastName;
@@ -14,35 +13,33 @@ public class Passenger {
         this.changeTicket = changeTicket;
     }
 
-    public boolean isChangeTicket() {
+    public boolean wantToChangeTicket() {
         return changeTicket;
+    }
+
+    public void setChangeTicket(boolean changeTicket) {
+        this.changeTicket = changeTicket;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     @Override
     public String toString() {
-        return "\nPassenger{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", nextTicket=" + nextTicket +
-                "}";
+        return "Passenger: " + firstName + " " +
+                lastName + " " +
+                "(Next Fligt = " + getCallsign() + " "+
+                "Change Ticket = " + changeTicket+")";
     }
 
+    private String getCallsign() {
+        return nextTicket == null ? "No" : nextTicket.getFlight().getCallsign();
+    }
 
     public Ticket getNextTicket() {
         return nextTicket;
@@ -56,9 +53,7 @@ public class Passenger {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Passenger passenger = (Passenger) o;
-
         if (changeTicket != passenger.changeTicket) return false;
         if (!firstName.equals(passenger.firstName)) return false;
         if (!lastName.equals(passenger.lastName)) return false;

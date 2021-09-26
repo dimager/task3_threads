@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Flight {
+public class Flight  {
     private final List<Passenger> passengerList = new LinkedList<>();
     private String callsign = "";
     private TerminalType terminalType;
@@ -33,6 +33,10 @@ public class Flight {
         CopyOnWriteArrayList copyOnWriteArrayList = new CopyOnWriteArrayList();
         copyOnWriteArrayList.addAll(passengerList);
         return copyOnWriteArrayList;
+    }
+
+    public List<Passenger> getPassengerList() {
+        return passengerList;
     }
 
     public void removePassengerFromFlight(Passenger passenger) {
@@ -123,6 +127,7 @@ public class Flight {
 
         }
     }
+
 
     @Override
     public boolean equals(Object o) {

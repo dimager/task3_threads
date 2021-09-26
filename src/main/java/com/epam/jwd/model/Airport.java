@@ -9,15 +9,12 @@ public class Airport {
     private String location;
 
     private final List<Terminal> terminals = new ArrayList<>();
+    private final List<Flight> FlightList = new CopyOnWriteArrayList<>();
     private final List<Flight> departureFlightList = new CopyOnWriteArrayList<>();
     private final List<Flight> arrivalFlightList = new CopyOnWriteArrayList<>();
 
-    public List<Flight> getDepartureFlightList() {
-        return departureFlightList;
-    }
-
-    public List<Flight> getArrivalFlightList() {
-        return arrivalFlightList;
+    public List<Flight> getFlightList() {
+        return FlightList;
     }
 
     public Airport(String name, String location) {
@@ -31,10 +28,6 @@ public class Airport {
 
     public String getName() {
         return name;
-    }
-
-    public String getLocation() {
-        return location;
     }
 
     @Override
