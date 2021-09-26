@@ -4,9 +4,9 @@ import com.epam.jwd.model.Airport;
 import com.epam.jwd.model.Flight;
 import com.epam.jwd.model.Terminal;
 import com.epam.jwd.model.TerminalType;
-import com.epam.jwd.service.AirportService;
 import com.epam.jwd.service.executor.CheckTableExecutor;
-import com.epam.jwd.service.generator.RandomPassengerThread;
+import com.epam.jwd.service.generator.PassengerGenerator;
+import com.epam.jwd.service.generator.TerminalGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,7 +42,7 @@ public class AirportCreator {
                 .setFlightType(TerminalType.ARRIVING)
                 .setDestination(destination)
                 .setFlightTime(localDateTime)
-                .setTerminal(AirportService.getRandomArrivalTerminal(airport))
+                .setTerminal(TerminalGenerator.getRandomArrivalTerminal(airport))
                 .build();
         fillFlightByRandomPassenger(arrivingFlight, airport, numberOfPassenger);
         airport.getFlightList().add(arrivingFlight);
@@ -55,7 +55,7 @@ public class AirportCreator {
                 .setFlightType(TerminalType.DEPARTING)
                 .setDestination(destination)
                 .setFlightTime(localDateTime)
-                .setTerminal(AirportService.getRandomDepartureTerminal(airport))
+                .setTerminal(TerminalGenerator.getRandomDepartureTerminal(airport))
                 .build();
         airport.getFlightList().add(departingFlight);
     }
@@ -67,7 +67,7 @@ public class AirportCreator {
     }
 
     private void fillFlightByRandomPassenger(Flight flight, Airport airport, int countPassenger) {
-        RandomPassengerThread passenger = new RandomPassengerThread(flight, airport);
+        PassengerGenerator passenger = new PassengerGenerator(flight, airport);
         for (int i = 0; i < countPassenger; i++) {
             Thread thread = new Thread(passenger);
             thread.start();

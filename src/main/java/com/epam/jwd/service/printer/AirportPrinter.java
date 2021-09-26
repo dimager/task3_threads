@@ -1,9 +1,8 @@
-package com.epam.jwd.service;
+package com.epam.jwd.service.printer;
 
 import com.epam.jwd.model.Airport;
 import com.epam.jwd.model.Flight;
 import com.epam.jwd.model.TerminalType;
-import com.epam.jwd.model.Terminal;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,9 +14,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class AirportService {
-    private final static Logger logger = LogManager.getLogger(AirportService.class);
-    private static final Random random = new Random();
+public class AirportPrinter {
+    private final static Logger logger = LogManager.getLogger(AirportPrinter.class);
     private static final String TABLE_HEAD_MESSAGE_STRING = "Table -> Time: ";
     private static final String TABLE_COLLUM_NAMES_STRING = String.format("\n%8s %10s %12s %10s %12s %12s", "Flight", "Terminal", "Date", "Dep Time", "Passengers", "Flight type");
     private static final String DEPARTING_FLIGHTS_STRING = "Departing flights:";
@@ -42,16 +40,6 @@ public class AirportService {
 
     public static void printPassengerList(Airport airport){
         airport.getFlightList().stream().forEach( flight -> printFlightPassenger(flight));
-    }
-
-    public static Terminal getRandomArrivalTerminal(Airport airport) {
-        List<Terminal> list = airport.getTerminals().stream().filter(terminal -> terminal.getTerminalType() == TerminalType.ARRIVING).collect(Collectors.toList());
-        return list.get(random.nextInt(list.size()));
-    }
-
-    public static Terminal getRandomDepartureTerminal(Airport airport) {
-        List<Terminal> list = airport.getTerminals().stream().filter(terminal -> terminal.getTerminalType() == TerminalType.DEPARTING).collect(Collectors.toList());
-        return list.get(random.nextInt(list.size()));
     }
 
     private static void printFlightList(List<Flight> list){

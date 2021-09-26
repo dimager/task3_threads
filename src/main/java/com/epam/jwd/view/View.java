@@ -1,7 +1,7 @@
 package com.epam.jwd.view;
 
 import com.epam.jwd.model.TerminalType;
-import com.epam.jwd.service.AirportService;
+import com.epam.jwd.service.printer.AirportPrinter;
 import com.epam.jwd.service.creator.AirportCreator;
 import com.epam.jwd.service.reader.UserInputReader;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +42,7 @@ public class View {
     }
 
     private void printPassengerList() {
-        AirportService.printPassengerList(airportMinsk.getAirport());
+        AirportPrinter.printPassengerList(airportMinsk.getAirport());
     }
 
     private void startCheckingFlightTableOption() {
@@ -64,7 +64,7 @@ public class View {
     }
 
     private void printFlightTableOption() {
-        AirportService.printTable(airportMinsk.getAirport());
+        AirportPrinter.printTable(airportMinsk.getAirport());
     }
 
     private void addNewArrivalFlightOption() {

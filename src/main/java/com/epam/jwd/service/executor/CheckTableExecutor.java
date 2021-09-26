@@ -38,7 +38,6 @@ public class CheckTableExecutor implements Runnable {
                 }
                 airport.getFlightList().removeIf(flight -> flight.getFlightTime().isBefore(LocalDateTime.now().minusHours(2))
                         && flight.getTerminal().getTerminalType() == TerminalType.DEPARTING);
-//                printCheckingData(printTable);
                 Thread.sleep(timeoutSeconds);
             } catch (InterruptedException e) {
                 state = false;
