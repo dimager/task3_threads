@@ -29,7 +29,7 @@ public class PassengerThread extends Thread {
     public void run() {
         if (Objects.nonNull(semaphore)) {
             if (passenger.isChangeTicket()) {
-                ticketExchanger();
+           //     ticketExchanger();
             }
             waiting();
             Thread.currentThread().setName("term. " + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
@@ -50,7 +50,6 @@ public class PassengerThread extends Thread {
         }
 
     }
-
 
     private void waiting() {
         while (LocalDateTime.now().isBefore(passenger.getNextTicket().getFlight().getFlightTime().minusHours(2))) {

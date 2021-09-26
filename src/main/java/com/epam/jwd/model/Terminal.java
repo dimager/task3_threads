@@ -17,6 +17,10 @@ public class Terminal {
         return terminalId;
     }
 
+    public FlightType getTerminalType() {
+        return terminalType;
+    }
+
     public void setTerminalId(String terminalId) {
         this.terminalId = terminalId;
     }

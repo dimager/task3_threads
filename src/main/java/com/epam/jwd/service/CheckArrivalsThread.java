@@ -23,7 +23,8 @@ public class CheckArrivalsThread implements Runnable {
                     if (flight.getFlightTime().isBefore(LocalDateTime.now())) {
                         System.out.println(flight.getCallsign() + " is arrived");
                         new Thread(new FlightService(flight, airport)).start();
-                        airport.getArrivalFlightList().remove(flight);
+                        if (flight.getAllPassengerFromFlight().isEmpty())
+                            airport.getArrivalFlightList().remove(flight);
                     }
                 }
                 airport.getDepartureFlightList().removeIf(flight -> flight.getFlightTime().isBefore(LocalDateTime.now()));
@@ -34,9 +35,7 @@ public class CheckArrivalsThread implements Runnable {
                 e.printStackTrace();
             } finally {
             }
-
         }
-
     }
 }
 

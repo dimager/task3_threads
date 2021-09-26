@@ -6,7 +6,7 @@ import com.epam.jwd.model.FlightType;
 import com.epam.jwd.model.Terminal;
 import com.epam.jwd.service.AirportService;
 import com.epam.jwd.service.CheckArrivalsThread;
-import com.epam.jwd.service.RandomPassenger;
+import com.epam.jwd.service.RandomPassengerThread;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +18,6 @@ public class start {
     public synchronized void test() throws InterruptedException {
 
         Airport airportMinsk = new Airport("National Airport Minsk", "Minsk,Belarus");
-
 
         Boolean aBoolean = new Boolean(true);
         int semaphoresize = 5;
@@ -34,6 +33,7 @@ public class start {
         airportMinsk.getTerminals().add(new Terminal("4", FlightType.ARRIVING, semaphoresize));
         airportMinsk.getTerminals().add(new Terminal("5", FlightType.ARRIVING, semaphoresize));
         airportMinsk.getTerminals().add(new Terminal("6", FlightType.ARRIVING, semaphoresize));
+        Flight flight = new Flight.Builder().setCallsign("BRU854")
 
         airportMinsk.getTerminals().add(new Terminal("A", FlightType.DEPARTING, semaphoresize));
         airportMinsk.getTerminals().add(new Terminal("B", FlightType.DEPARTING, semaphoresize));
@@ -42,12 +42,35 @@ public class start {
         airportMinsk.getTerminals().add(new Terminal("F", FlightType.DEPARTING, semaphoresize));
 
         //
-        Flight arrivingFlight1 = new Flight("BRU854",FlightType.ARRIVING,"Saint-Petersburg",airportMinsk.getTerminals().get(1),LocalDateTime.now().plusMinutes(1));
-        Flight arrivingFlight2 = new Flight("AFL2501",FlightType.ARRIVING,"Moscow",airportMinsk.getTerminals().get(2),LocalDateTime.now().plusMinutes(2));
-        Flight arrivingFlight3 = new Flight("BRU933",FlightType.ARRIVING,"Kiev",airportMinsk.getTerminals().get(2),LocalDateTime.now().plusMinutes(3));
+
+
+        Flight arrivingFlight1 = new Flight("BRU854",
+                FlightType.ARRIVING,
+                "Saint-Petersburg",
+                AirportService.getRandomArrivalTerminal(airportMinsk),
+                LocalDateTime.now().plusMinutes(1));
+
+        Flight arrivingFlight2 = new Flight("AFL2501",
+                FlightType.ARRIVING,
+                "Moscow",
+                AirportService.getRandomArrivalTerminal(airportMinsk),
+                LocalDateTime.now().plusMinutes(2));
+
+        Flight arrivingFlight3 = new Flight("BRU933",
+                FlightType.ARRIVING,
+                "Kiev",
+                AirportService.getRandomArrivalTerminal(airportMinsk),
+                LocalDateTime.now().plusMinutes(3));
 
         //
-        Flight departFlight1 = new Flight("AFL1840",FlightType.DEPARTING,"Warsaw",airportMinsk.getTerminals().get(7),LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2).plusMinutes(10)));
+
+
+        Flight departFlight1 = new Flight("AFL1840",
+                FlightType.DEPARTING,
+                "Warsaw",
+                AirportService.getRandomDepartureTerminal(airportMinsk),
+                LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2).plusMinutes(10)));
+
         Flight departFlight2 = new Flight("BRU875",FlightType.DEPARTING,"Riga",airportMinsk.getTerminals().get(8),LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(1).minusMinutes(55)));
         Flight departFlight3 = new Flight("BRU366",FlightType.DEPARTING,"Vilnius",airportMinsk.getTerminals().get(9),LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(1).minusMinutes(55)));
 
@@ -92,6 +115,8 @@ public class start {
                     System.out.println("Wait " + Thread.getAllStackTraces().keySet().stream().map(thread -> thread.getName().contains("wait")).count());
                 case 7:
                     aBoolean = new Boolean(false);
+                case 8:
+                    airportMinsk.getDepartureFlightList().stream().forEach(flight -> System.out.println(flight.toString()));
                 default:
                     break;
             }
@@ -101,7 +126,7 @@ public class start {
     }
 
     public void fillFlightByRandomPassenger(Flight flight, Airport airport, int countPassenger) {
-        RandomPassenger passenger = new RandomPassenger(flight, airport);
+        RandomPassengerThread passenger = new RandomPassengerThread(flight, airport);
         for (int i = 0; i <countPassenger; i++){
             Thread thread = new Thread(passenger);
             thread.start();
