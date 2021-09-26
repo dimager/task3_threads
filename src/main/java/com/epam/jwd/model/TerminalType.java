@@ -1,5 +1,5 @@
 package com.epam.jwd.model;
 
-public enum FlightType {
+public enum TerminalType {
     DEPARTING,ARRIVING
 }

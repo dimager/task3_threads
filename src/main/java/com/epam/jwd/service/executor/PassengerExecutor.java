@@ -1,23 +1,23 @@
-package com.epam.jwd.service;
+package com.epam.jwd.service.executor;
 
 import com.epam.jwd.model.Flight;
 import com.epam.jwd.model.Passenger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class PassengerThread extends Thread {
-
+public class PassengerExecutor extends Thread {
+    private final static Logger logger = LogManager.getLogger("AirportInfo");
     private final Passenger passenger;
     private final Semaphore semaphore;
     private final Exchanger<Flight> flightExchanger;
     private Flight flight;
 
-    public PassengerThread(Semaphore semaphore, Passenger passenger, Flight flight, Exchanger<Flight> flightExchanger) {
+    public PassengerExecutor(Semaphore semaphore, Passenger passenger, Flight flight, Exchanger<Flight> flightExchanger) {
         this.passenger = passenger;
         this.semaphore = semaphore;
         this.flight = flight;
@@ -31,11 +31,11 @@ public class PassengerThread extends Thread {
             if (passenger.isChangeTicket()) {
            //     ticketExchanger();
             }
-            waiting();
+            hasToWaitNextFlight();
             Thread.currentThread().setName("term. " + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
             try {
                 semaphore.acquire();
-                System.out.println(passenger.getFirstName() + " " + passenger.getLastName() + " is going to next flight " + passenger.getNextTicket().getFlight().getCallsign());
+                logger.info(passenger.getFirstName() + " " + passenger.getLastName() + " is going to next flight " + passenger.getNextTicket().getFlight().getCallsign());
                 passenger.setNextTicket(null);
                 flight.addPassengerToFlight(passenger);
                 sleep(2000);
@@ -51,28 +51,15 @@ public class PassengerThread extends Thread {
 
     }
 
-    private void waiting() {
+    private void hasToWaitNextFlight() {
         while (LocalDateTime.now().isBefore(passenger.getNextTicket().getFlight().getFlightTime().minusHours(2))) {
-            Thread.currentThread().setName("wait " + passenger.getNextTicket().getFlight().getCallsign());
-            System.out.println(passenger.getFirstName() + " " + passenger.getLastName() + " is waing flight" + passenger.getNextTicket().getFlight().getCallsign());
+            Thread.currentThread().setName(passenger.getFirstName() + " " + passenger.getLastName() + " is waiting " + passenger.getNextTicket().getFlight().getCallsign());
+            logger.info(passenger.getFirstName() + " " + passenger.getLastName() + " is waing flight" + passenger.getNextTicket().getFlight().getCallsign());
             try {
                 sleep(60000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void ticketExchanger() {
-        try {
-
-            Thread.currentThread().setName("exchenger " + flight.getCallsign());
-            this.flight = flightExchanger.exchange(flight, 90, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-
     }
 }

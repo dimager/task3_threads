@@ -1,28 +1,11 @@
 package com.epam.jwd.model;
 
-import java.time.LocalDate;
 
 public class Ticket {
-    private TicketType ticketType;
     private Flight flight;
 
-
     public Ticket(Flight flight) {
-        this.ticketType = TicketType.ECONOMY;
         this.flight = flight;
-    }
-
-    public Ticket(TicketType ticketType, Flight flight) {
-        this.ticketType = ticketType;
-        this.flight = flight;
-    }
-
-    public TicketType getTicketType() {
-        return ticketType;
-    }
-
-    public void setTicketType(TicketType ticketType) {
-        this.ticketType = ticketType;
     }
 
     public Flight getFlight() {
@@ -36,8 +19,22 @@ public class Ticket {
     @Override
     public String toString() {
         return "Ticket{" +
-                "ticketType=" + ticketType +
                 ", flight=" + flight +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ticket ticket = (Ticket) o;
+
+        return flight != null ? flight.equals(ticket.flight) : ticket.flight == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return flight != null ? flight.hashCode() : 0;
     }
 }

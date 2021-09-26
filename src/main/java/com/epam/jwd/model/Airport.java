@@ -47,4 +47,28 @@ public class Airport {
                 ", arrivalFlightList=" + arrivalFlightList +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Airport airport = (Airport) o;
+
+        if (!name.equals(airport.name)) return false;
+        if (!location.equals(airport.location)) return false;
+        if (!terminals.equals(airport.terminals)) return false;
+        if (!departureFlightList.equals(airport.departureFlightList)) return false;
+        return arrivalFlightList.equals(airport.arrivalFlightList);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + location.hashCode();
+        result = 31 * result + terminals.hashCode();
+        result = 31 * result + departureFlightList.hashCode();
+        result = 31 * result + arrivalFlightList.hashCode();
+        return result;
+    }
 }

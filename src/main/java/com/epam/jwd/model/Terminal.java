@@ -4,10 +4,10 @@ import java.util.concurrent.Semaphore;
 
 public class Terminal {
     private String terminalId;
-    private FlightType terminalType;
+    private TerminalType terminalType;
     private Semaphore semaphore;
 
-    public Terminal(String terminalId, FlightType terminalType, int semaphoreSize ) {
+    public Terminal(String terminalId, TerminalType terminalType, int semaphoreSize ) {
         this.terminalId = terminalId;
         this.terminalType = terminalType;
         semaphore = new Semaphore(semaphoreSize,true);
@@ -17,7 +17,7 @@ public class Terminal {
         return terminalId;
     }
 
-    public FlightType getTerminalType() {
+    public TerminalType getTerminalType() {
         return terminalType;
     }
 
@@ -39,5 +39,25 @@ public class Terminal {
                 "terminalId='" + terminalId + '\'' +
                 ", terminalType=" + terminalType +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Terminal terminal = (Terminal) o;
+
+        if (!terminalId.equals(terminal.terminalId)) return false;
+        if (terminalType != terminal.terminalType) return false;
+        return semaphore.equals(terminal.semaphore);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = terminalId.hashCode();
+        result = 31 * result + terminalType.hashCode();
+        result = 31 * result + semaphore.hashCode();
+        return result;
     }
 }

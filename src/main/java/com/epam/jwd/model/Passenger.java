@@ -52,4 +52,25 @@ public class Passenger {
         this.nextTicket = nextTicket;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Passenger passenger = (Passenger) o;
+
+        if (changeTicket != passenger.changeTicket) return false;
+        if (!firstName.equals(passenger.firstName)) return false;
+        if (!lastName.equals(passenger.lastName)) return false;
+        return nextTicket != null ? nextTicket.equals(passenger.nextTicket) : passenger.nextTicket == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = firstName.hashCode();
+        result = 31 * result + lastName.hashCode();
+        result = 31 * result + (nextTicket != null ? nextTicket.hashCode() : 0);
+        result = 31 * result + (changeTicket ? 1 : 0);
+        return result;
+    }
 }
