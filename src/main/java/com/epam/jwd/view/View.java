@@ -35,7 +35,7 @@ public class View {
         return userInputMap.size();
     }
     public View() {
-        createDemoAirport(3);
+        createDemoAirport(2);
         userInputMap.put(1, this::startCheckingFlightTableOption);
         userInputMap.put(2, this::stopCheckingFlightTableOption);
         userInputMap.put(3, this::printFlightTableOption);
@@ -106,9 +106,9 @@ public class View {
         airportMinsk.addDepartingFlightToAirport("RYR1201", "Vilnius", LocalDateTime.now().minusHours(1));
         airportMinsk.addDepartingFlightToAirport("AUI351", "Kiev", LocalDateTime.now().plusMinutes(10));
         airportMinsk.addDepartingFlightToAirport("WZZ1840", "Krakow", LocalDateTime.now().plusHours(1));
-        airportMinsk.addArrivingFlightToAirport("BRU854", "Moscow", LocalDateTime.now().plusMinutes(1), 25);
-        airportMinsk.addArrivingFlightToAirport("AFL2502", "Saint-Petersburg", LocalDateTime.now().plusMinutes(2), 20);
-        airportMinsk.addArrivingFlightToAirport("THY1532", "Istanbul", LocalDateTime.now().plusMinutes(6), 30);
-        airportMinsk.addArrivingFlightToAirport("DLH422", "Berlin", LocalDateTime.now().plusMinutes(7), 45);
+        airportMinsk.addArrivingFlightToAirport("BRU854", "Moscow", LocalDateTime.now().plusMinutes(1), 65);
+        airportMinsk.addArrivingFlightToAirport("AFL2502", "Saint-Petersburg", LocalDateTime.now().plusMinutes(2), 55);
+        airportMinsk.addArrivingFlightToAirport("THY1532", "Istanbul", LocalDateTime.now().plusMinutes(6), 45);
+        airportMinsk.addArrivingFlightToAirport("DLH422", "Berlin", LocalDateTime.now().plusMinutes(7), 55);
     }
 }

@@ -55,7 +55,7 @@ public class PassengerExecutor extends Thread {
                 appLogger.info(passenger.getFirstName() + " " + passenger.getLastName() + GOING_NEXT_FLIGHT_STRING + passenger.getNextTicket().getFlight().getCallsign());
                 passenger.setNextTicket(null);
                 flight.addPassengerToFlight(passenger);
-                sleep(2000);
+                sleep(4000);
             } catch (InterruptedException e) {
                 logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
                 e.printStackTrace();

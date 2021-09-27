@@ -32,14 +32,14 @@ public class PassengerGenerator extends Thread {
             logger.debug(GENERATE_PASSENGER_MESSAGE);
             flight.addPassengerToFlight(generatePassenger(airport));
             Thread.currentThread().setName(GENERATE_PASSENGER_MESSAGE);
-            sleep(2000);
+            sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public Passenger generatePassenger(Airport airport) {
-        if (random.nextInt(10) % 3 == 0) {
+        if (random.nextInt(10) % 6 == 0) {
             return new Passenger(firstNameArray[random.nextInt(firstNameArray.length)], lastNameArray[random.nextInt(lastNameArray.length)], null, false);
         } else {
             return new Passenger(firstNameArray[random.nextInt(firstNameArray.length)], lastNameArray[random.nextInt(lastNameArray.length)], new Ticket(getFlight(airport)), isChangeTicket());
