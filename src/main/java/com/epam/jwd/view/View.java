@@ -27,7 +27,6 @@ public class View {
     private Thread thread = new Thread();
     private boolean state = true;
 
-
     public static int getUserMapSize(){
         return userInputMap.size();
     }
@@ -81,8 +80,6 @@ public class View {
             userInputMap.get(UserInputReader.read(MENU)).run();
         }
     }
-
-
 
     private void createDemoAirport(int terminalSemaporeSize) {
         airportMinsk = new AirportCreator("National Airport Minsk", "Minsk, Belarus");

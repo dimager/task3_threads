@@ -24,6 +24,10 @@ public class PassengerExecutor extends Thread {
     private static final String TICKET_EXCHANGER_START_METHOD_STRING = "ticketExchanger method start";
     private static final String WAIT_METHOD_START_STRING = "waitNextFlight method ";
     private static final String TIMEOUT_EXCEPTION_STRING = "Timeout exception. Ticket is not changed";
+    private static final String EXCHANGER_STRING = "*Exchanger: ";
+    private static final String WANT_TO_CHANGE_TICKET_STRING = " want to change ticket  ";
+    private static final String CHANGED_TICKET_WITH_STRING = " changed ticket with ";
+    private static final String FAILED_CHANGE_STRING = " change is failed, same flight with ";
     private final Passenger passenger;
     private final Semaphore semaphore;
     private final Exchanger<Passenger> ticketExchanger;
@@ -40,11 +44,11 @@ public class PassengerExecutor extends Thread {
     public void run() {
         logger.debug(PASSENGER_EXECUTOR_THREAD_START_STRING);
         if (Objects.nonNull(semaphore)) {
+            Thread.currentThread().setName(TERM_THREAD_STRING + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
             if (passenger.wantToChangeTicket()) {
                 ticketExchanger();
             }
             flight=passenger.getNextTicket().getFlight();
-            Thread.currentThread().setName(TERM_THREAD_STRING + passenger.getNextTicket().getFlight().getTerminal().getTerminalId());
             waitNextFlight();
             try {
                 semaphore.acquire();
@@ -67,20 +71,19 @@ public class PassengerExecutor extends Thread {
     private void ticketExchanger() {
         logger.debug(TICKET_EXCHANGER_START_METHOD_STRING);
         try {
-            appLogger.info("******" + passenger.getFirstName() + " " + passenger.getLastName() + " want to change ticket  " + passenger.getNextTicket().getFlight().getCallsign());
+            appLogger.info(EXCHANGER_STRING + passenger.getFirstName() + " " + passenger.getLastName() + WANT_TO_CHANGE_TICKET_STRING + passenger.getNextTicket().getFlight().getCallsign());
             if (!passenger.getNextTicket().getFlight().equals(ticketExchanger.exchange(passenger,60, TimeUnit.SECONDS).getNextTicket().getFlight())) {
                 Ticket ticket = passenger.getNextTicket();
                 passenger.setNextTicket(ticketExchanger.exchange(passenger,60, TimeUnit.SECONDS).getNextTicket());
                 ticketExchanger.exchange(passenger).setNextTicket(ticket);
                 passenger.setChangeTicket(false);
-                appLogger.info("******" + passenger.getFirstName() + " " + passenger.getLastName() + " changed ticket with " + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());
+                appLogger.info(EXCHANGER_STRING + passenger.getFirstName() + " " + passenger.getLastName() + CHANGED_TICKET_WITH_STRING + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());
             } else {
-                appLogger.info("******" + passenger.getFirstName() + passenger.getLastName() + " change is failed, same flight with " + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());
-            }
+                appLogger.info(EXCHANGER_STRING + passenger.getFirstName() + passenger.getLastName() + FAILED_CHANGE_STRING + ticketExchanger.exchange(passenger).getFirstName() + " " + ticketExchanger.exchange(passenger).getLastName());            }
         } catch (InterruptedException e) {
             logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
         } catch (TimeoutException e) {
-            logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
+            logger.error(TIMEOUT_EXCEPTION_STRING );
         }
     }
 
@@ -92,7 +95,7 @@ public class PassengerExecutor extends Thread {
             try {
                 sleep(60000);
             } catch (InterruptedException e) {
-                logger.error(TIMEOUT_EXCEPTION_STRING + e);
+                logger.error(INTERRUPTION_ERROR_MESSAGE_STRING + e);
             }
         }
     }
