@@ -11,14 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class AirportCreator {
     private final static Logger logger = LogManager.getLogger(AirportCreator.class);
     private static final String GREAT_AIRPORT_STRING = "Create airport ";
     private static final String ADD_TERMINAL_STRING = "Add terminal to airport ";
-    private static final String ADD_ARRIVING_FLIGHT_STRING = "Add arriving flight to airport ";
-    private static final String ADD_DEPARTING_FLIGHT_STRING =  "Add departing flight to airport ";;
     private static final String AIRPORT_START_WORKING_STRING = "Airport start working thread";
+    private static final String ADD_FLIGHT_TO_AIRPORT_STRING = " was added";
+    private static final String EXCEPTIONS_STRING = "Invalid input parameter (null)";
     private Airport airport;
 
     public AirportCreator(String airportName, String airportLocation) {
@@ -36,7 +37,11 @@ public class AirportCreator {
     }
 
     public void addArrivingFlightToAirport(String callsign, String destination, LocalDateTime localDateTime, int numberOfPassenger) {
-        logger.debug(ADD_ARRIVING_FLIGHT_STRING + airport.getName());
+        if (Objects.isNull(callsign) || Objects.isNull(destination) || Objects.isNull(localDateTime)  || numberOfPassenger < 1){
+            logger.error(EXCEPTIONS_STRING);
+            throw new NullPointerException(EXCEPTIONS_STRING);
+        }
+        logger.debug(callsign + ADD_FLIGHT_TO_AIRPORT_STRING);
         Flight arrivingFlight = new Flight.Builder()
                 .setCallsign(callsign)
                 .setFlightType(TerminalType.ARRIVING)
@@ -49,7 +54,11 @@ public class AirportCreator {
     }
 
     public void addDepartingFlightToAirport(String callsign, String destination, LocalDateTime localDateTime) {
-        logger.debug(ADD_DEPARTING_FLIGHT_STRING + airport.getName());
+        if (Objects.isNull(callsign) || Objects.isNull(destination) || Objects.isNull(localDateTime)){
+            logger.error(EXCEPTIONS_STRING);
+            throw new NullPointerException(EXCEPTIONS_STRING);
+        }
+        logger.debug(callsign + ADD_FLIGHT_TO_AIRPORT_STRING);
         Flight departingFlight = new Flight.Builder()
                 .setCallsign(callsign)
                 .setFlightType(TerminalType.DEPARTING)

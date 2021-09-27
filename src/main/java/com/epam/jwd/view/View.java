@@ -4,8 +4,11 @@ import com.epam.jwd.model.TerminalType;
 import com.epam.jwd.service.printer.AirportPrinter;
 import com.epam.jwd.service.creator.AirportCreator;
 import com.epam.jwd.service.reader.UserInputReader;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ public class View {
             "Select:";
     private static final String ALLREADY_STARTED_STRING = "Allready started";
     private static final String NOT_STARTED_STRING = "Not started";
+    private static final String STARTED_STRING = " started";
     private AirportCreator airportMinsk;
     private Thread thread = new Thread();
     private boolean state = true;
@@ -41,13 +45,14 @@ public class View {
     }
 
     private void printPassengerList() {
-        AirportPrinter.printPassengerList(airportMinsk.getAirport());
+        AirportPrinter.printAirportPassengerList(airportMinsk.getAirport());
     }
 
     private void startCheckingFlightTableOption() {
         if (!thread.isAlive()) {
             thread = new Thread(airportMinsk.startWorking());
             thread.start();
+            logger.info(STARTED_STRING);
         }
         else
             logger.info(ALLREADY_STARTED_STRING);
@@ -67,33 +72,36 @@ public class View {
     }
 
     private void addNewArrivalFlightOption() {
+        logger.info("Add BRU111. check table");
         airportMinsk.addArrivingFlightToAirport("BRU111", "Moscow", LocalDateTime.now().plusMinutes(1), 30);
     }
 
     private void exitOption() {
         stopCheckingFlightTableOption();
         state=false;
+        System.exit(0);
     }
 
-    public void start() {
+    public void start(Level level) {
+        Configurator.setLevel("com.epam.jwd",level);
         while (state) {
             userInputMap.get(UserInputReader.read(MENU)).run();
         }
     }
 
-    private void createDemoAirport(int terminalSemaporeSize) {
+    private void createDemoAirport(int terminalSemaphoreSize) {
         airportMinsk = new AirportCreator("National Airport Minsk", "Minsk, Belarus");
-        airportMinsk.addTerminalToAirport("1", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("2", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("3", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("4", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("5", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("6", TerminalType.ARRIVING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("A", TerminalType.DEPARTING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("B", TerminalType.DEPARTING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("D", TerminalType.DEPARTING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("E", TerminalType.DEPARTING, terminalSemaporeSize);
-        airportMinsk.addTerminalToAirport("F", TerminalType.DEPARTING, terminalSemaporeSize);
+        airportMinsk.addTerminalToAirport("1", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("2", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("3", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("4", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("5", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("6", TerminalType.ARRIVING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("A", TerminalType.DEPARTING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("B", TerminalType.DEPARTING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("D", TerminalType.DEPARTING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("E", TerminalType.DEPARTING, terminalSemaphoreSize);
+        airportMinsk.addTerminalToAirport("F", TerminalType.DEPARTING, terminalSemaphoreSize);
         airportMinsk.addDepartingFlightToAirport("BTI3201", "Warsaw", LocalDateTime.now().plusHours(2).plusMinutes(5));
         airportMinsk.addDepartingFlightToAirport("RYR1201", "Vilnius", LocalDateTime.now().minusHours(1));
         airportMinsk.addDepartingFlightToAirport("AUI351", "Kiev", LocalDateTime.now().plusMinutes(10));

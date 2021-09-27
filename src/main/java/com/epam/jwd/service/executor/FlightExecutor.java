@@ -24,12 +24,12 @@ public class FlightExecutor implements Runnable {
     private Exchanger<Passenger> ticketExchanger = new Exchanger<>();
 
     public FlightExecutor(Flight flight) {
+        logger.debug(FLIGHT_EXECUTOR_THREAD_START_STRING );
         this.flight = flight;
     }
 
     @Override
     public void run() {
-        logger.debug(FLIGHT_EXECUTOR_THREAD_START_STRING );
         Thread.currentThread().setName(THREAD_NAME_STRING + flight.getCallsign());
         for (Passenger passenger : flight.getAllPassengerFromFlight()) {
             if (Objects.nonNull(passenger.getNextTicket())) {

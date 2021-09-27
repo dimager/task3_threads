@@ -38,7 +38,7 @@ public class AirportPrinter {
         flight.getAllPassengerFromFlight().stream().forEach(passenger -> logger.info(passenger));
     }
 
-    public static void printPassengerList(Airport airport){
+    public static void printAirportPassengerList(Airport airport){
         airport.getFlightList().stream().forEach( flight -> printFlightPassenger(flight));
     }
 

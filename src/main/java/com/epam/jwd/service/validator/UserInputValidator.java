@@ -8,13 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UserInputValidator {
-    private final static Logger logger = LogManager.getLogger(UserInputValidator.class);
+    private static final Logger logger = LogManager.getLogger(UserInputValidator.class);
     private static final String INPUT_PATTERN = "[1-" + View.getUserMapSize() + "]";
     private static final String INCORRECT_CHOICE_MESSAGE = "Incorrect choice";
-    private static Pattern pattern = Pattern.compile(INPUT_PATTERN);
+    private static final Pattern pattern = Pattern.compile(INPUT_PATTERN);
 
     public static boolean validateInput(String inputString) {
-        if (inputString.length() != 1) {
+        if (inputString.trim().length() != 1) {
             logger.info(INCORRECT_CHOICE_MESSAGE);
             return false;
         } else {
